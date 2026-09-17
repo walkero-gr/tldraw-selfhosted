@@ -2,6 +2,8 @@ import cors from '@fastify/cors'
 import websocketPlugin from '@fastify/websocket'
 import fastify from 'fastify'
 import path from 'node:path';
+import { mkdir, writeFile } from 'fs/promises'
+import { join } from 'path'
 import ServeStatic from '@fastify/static';
 import type { RawData } from 'ws'
 import { loadAsset, storeAsset } from './assets.js'
@@ -77,6 +79,38 @@ app.register(async (app) => {
 	app.get('/api/unfurl', async (req, res) => {
 		const url = (req.query as any).url as string
 		res.send(await unfurl(url))
+	});
+
+	// Export room with full diagram snapshot
+	app.get('/api/export/:roomId', async (req, res) => {
+		const roomId = (req.params as any).roomId as string
+		try {
+			const room = await makeOrLoadRoom(roomId)
+			const snapshot = room.getCurrentSnapshot()
+			res.send({ roomId, snapshot })
+		} catch (error) {
+			console.error('Export failed:', error)
+			res.code(500).send({ error: 'Export failed' })
+		}
+	});
+
+	// Import room with full diagram snapshot
+	app.post('/api/import/:roomId', async (req, res) => {
+		const roomId = (req.params as any).roomId as string
+		const { snapshot } = req.body as any
+		try {
+			if (!snapshot) {
+				return res.code(400).send({ error: 'Missing snapshot' })
+			}
+			// Write snapshot to disk. Next room load will use it.
+			const DIR = process.env.CONFIG_DIR ? join(process.env.CONFIG_DIR, 'rooms') : './.rooms'
+			await mkdir(DIR, { recursive: true })
+			await writeFile(join(DIR, roomId), JSON.stringify(snapshot))
+			res.send({ ok: true })
+		} catch (error) {
+			console.error('Import failed:', error)
+			res.code(500).send({ error: 'Import failed' })
+		}
 	});
 
 	if(process.env.NODE_ENV === 'production') {

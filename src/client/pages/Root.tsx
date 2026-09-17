@@ -1,8 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { uniqueId } from 'tldraw'
 import { useState, useEffect, useRef } from 'react'
-import { addRoom, deleteRoom, sortedRooms, updateRoomName, type RoomHistory } from '../roomHistory'
+import { addRoom, deleteRoom, sortedRooms, updateRoomName, getRoomHistory, type RoomHistory } from '../roomHistory'
+import { setLocalStorageItem } from '../localStorage'
+import { getCurrentUserId } from '../userSession'
 import './Root.css'
+
+const ROOMS_KEY = 'tldraw-room-history'
 
 export function Root() {
 	const navigate = useNavigate()
@@ -59,11 +63,25 @@ export function Root() {
 		}
 	}
 
-	const handleExportRoom = (e: React.MouseEvent, room: RoomHistory) => {
+	const handleExportRoom = async (e: React.MouseEvent, room: RoomHistory) => {
 		e.stopPropagation()
 		try {
+			// Fetch diagram snapshot from server
+			let snapshot = null
+			try {
+				const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? 'http://localhost:5858';
+				const exportRes = await fetch(`${WORKER_URL}/api/export/${room.id}`)
+				if (exportRes.ok) {
+					const data = await exportRes.json()
+					snapshot = data.snapshot
+				}
+			} catch (err) {
+				console.warn('Could not fetch snapshot:', err)
+			}
+
 			const roomData = {
 				room: room,
+				snapshot: snapshot,
 				exportedAt: new Date().toISOString(),
 			}
 			const json = JSON.stringify(roomData)
@@ -91,8 +109,45 @@ export function Root() {
 
 			if (data.room && data.room.id) {
 				const importedRoom = data.room as RoomHistory
-				addRoom(importedRoom.id)
-				updateRoomName(importedRoom.id, importedRoom.name || '')
+				// Force-update room entry to replace any existing version
+				const rooms = getRoomHistory()
+				const idx = rooms.findIndex(r => r.id === importedRoom.id)
+				if (idx >= 0) {
+					// Replace existing entry
+					rooms[idx] = {
+						id: importedRoom.id,
+						name: importedRoom.name,
+						createdAt: importedRoom.createdAt || Date.now(),
+						lastAccessedAt: Date.now(),
+						createdByUser: importedRoom.createdByUser || getCurrentUserId(),
+					}
+					setLocalStorageItem(ROOMS_KEY, JSON.stringify(rooms))
+				} else {
+					// New room, add it
+					addRoom(importedRoom.id)
+					updateRoomName(importedRoom.id, importedRoom.name || '')
+				}
+
+				// If snapshot included, restore it
+				if (data.snapshot) {
+					try {
+						const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? 'http://localhost:5858';
+						const importRes = await fetch(
+							`${WORKER_URL}/api/import/${importedRoom.id}`,
+							{
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ snapshot: data.snapshot }),
+							}
+						)
+						if (!importRes.ok) {
+							console.warn('Could not restore snapshot:', await importRes.text())
+						}
+					} catch (err) {
+						console.warn('Could not restore snapshot:', err)
+					}
+				}
+
 				setRooms(sortedRooms())
 				navigate(`/${importedRoom.id}`)
 			} else {
