@@ -80,7 +80,11 @@ body {
 	height: 24px;
 	cursor: pointer;
 	position: relative;
-	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	font-weight: 500;
 }
 
 .RoomWrapper-copy:has(.RoomWrapper-copied) {
@@ -94,6 +98,8 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	font-size: 12px;
+	font-weight: 500;
 }
 
 .RoomWrapper-copy:hover {

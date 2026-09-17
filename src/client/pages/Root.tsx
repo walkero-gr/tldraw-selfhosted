@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { uniqueId } from 'tldraw'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { addRoom, deleteRoom, sortedRooms, updateRoomName, type RoomHistory } from '../roomHistory'
 import './Root.css'
 
@@ -10,6 +10,7 @@ export function Root() {
 	const [showList, setShowList] = useState(false)
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [editingName, setEditingName] = useState('')
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
 		setRooms(sortedRooms())
@@ -58,6 +59,54 @@ export function Root() {
 		}
 	}
 
+	const handleExportRoom = (e: React.MouseEvent, room: RoomHistory) => {
+		e.stopPropagation()
+		try {
+			const roomData = {
+				room: room,
+				exportedAt: new Date().toISOString(),
+			}
+			const json = JSON.stringify(roomData)
+			const link = document.createElement('a')
+			link.href = URL.createObjectURL(new Blob([json]))
+			link.download = `${room.name || room.id}.tldr`
+			link.click()
+			URL.revokeObjectURL(link.href)
+		} catch (err) {
+			console.error('Export failed:', err)
+		}
+	}
+
+	const handleImportClick = () => {
+		fileInputRef.current?.click()
+	}
+
+	const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (!file) return
+
+		try {
+			const json = await file.text()
+			const data = JSON.parse(json)
+
+			if (data.room && data.room.id) {
+				const importedRoom = data.room as RoomHistory
+				addRoom(importedRoom.id)
+				updateRoomName(importedRoom.id, importedRoom.name || '')
+				setRooms(sortedRooms())
+				navigate(`/${importedRoom.id}`)
+			} else {
+				console.error('Invalid .tldr file format')
+			}
+		} catch (err) {
+			console.error('Import failed:', err)
+		}
+
+		if (fileInputRef.current) {
+			fileInputRef.current.value = ''
+		}
+	}
+
 	const formatDate = (timestamp: number) => {
 		return new Date(timestamp).toLocaleDateString('en-US', {
 			month: 'short',
@@ -77,6 +126,12 @@ export function Root() {
 					<button className="Root-button Root-button--primary" onClick={handleNewRoom}>
 						✨ New Room
 					</button>
+					<button
+						className="Root-button"
+						onClick={handleImportClick}
+					>
+						⬆️ Import Room
+					</button>
 					{rooms.length > 0 && (
 						<button className="Root-button" onClick={handleLastRoom}>
 							📋 Resume Last Room
@@ -84,13 +139,21 @@ export function Root() {
 					)}
 					{rooms.length > 0 && (
 						<button
-							className="Root-button Root-button--secondary"
+							className="Root-button"
 							onClick={() => setShowList(!showList)}
 						>
 							{showList ? '✕ Close' : '📚 Room History'} ({rooms.length})
 						</button>
 					)}
 				</div>
+
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept=".tldr"
+					style={{ display: 'none' }}
+					onChange={handleImportFile}
+				/>
 
 				{showList && rooms.length > 0 && (
 					<div className="Root-list">
@@ -146,6 +209,13 @@ export function Root() {
 												title="Rename room"
 											>
 												✏️
+											</button>
+											<button
+												className="Root-room-export"
+												onClick={(e) => handleExportRoom(e, room)}
+												title="Export room"
+											>
+												⬇️
 											</button>
 											<button
 												className="Root-room-delete"
