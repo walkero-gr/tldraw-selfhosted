@@ -1,16 +1,18 @@
-FROM node:22-alpine as base
+FROM node:26-alpine AS base
 
 RUN apk add --no-cache dumb-init
 
 WORKDIR /usr/src/app
 
-FROM base as deps
+FROM base AS deps
+
+RUN npm install -g yarn
 
 COPY --chown=node:node package.json yarn.lock /usr/src/app/
 
 RUN yarn install
 
-FROM deps as builder
+FROM deps AS builder
 
 COPY --chown=node:node . /usr/src/app
 
@@ -19,11 +21,11 @@ ENV VITE_TLDRAW_LICENSE_KEY=${VITE_TLDRAW_LICENSE_KEY}
 
 RUN yarn build
 
-FROM deps as prod-deps
+FROM deps AS prod-deps
 
 RUN yarn install --production
 
-FROM base as app
+FROM base AS app
 
 COPY --chown=node:node --from=builder /usr/src/app/dist /usr/src/app/dist
 COPY --chown=node:node --from=prod-deps /usr/src/app/node_modules /usr/src/app/node_modules

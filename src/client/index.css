@@ -1,9 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap');
 @import url('tldraw/tldraw.css');
 
+#root {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+}
+
 body {
 	font-family: 'Inter', sans-serif;
-	overscroll-behavior: none;
+	overflow-wrap: none;
 }
 
 .RoomWrapper {
@@ -80,6 +98,95 @@ body {
 
 .RoomWrapper-copy:hover {
 	border: 1px solid var(--black-transparent-lighter);
+}
+
+.RoomWrapper-room-info {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.RoomWrapper-room-display {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	padding: 4px 8px;
+	border-radius: 4px;
+	transition: background 0.2s ease;
+}
+
+.RoomWrapper-room-display:hover {
+	background: var(--black-transparent-lighter);
+}
+
+.RoomWrapper-room-name {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.RoomWrapper-name {
+	font-weight: 600;
+	color: var(--text);
+}
+
+.RoomWrapper-id {
+	font-size: 12px;
+	color: var(--black-transparent-light);
+	font-family: monospace;
+}
+
+.RoomWrapper-edit-hint {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 12px;
+	padding: 2px 4px;
+	opacity: 0.6;
+	transition: opacity 0.2s ease;
+}
+
+.RoomWrapper-edit-hint:hover {
+	opacity: 1;
+}
+
+.RoomWrapper-room-edit {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.RoomWrapper-room-edit input {
+	padding: 4px 8px;
+	border: 1px solid var(--focus);
+	border-radius: 4px;
+	font-size: 13px;
+	font-family: 'Inter', sans-serif;
+	color: var(--text);
+	background: var(--background);
+	min-width: 150px;
+}
+
+.RoomWrapper-room-edit input:focus {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--black-transparent-lighter);
+}
+
+.RoomWrapper-save-btn {
+	background: var(--focus);
+	color: white;
+	border: none;
+	border-radius: 4px;
+	padding: 4px 8px;
+	cursor: pointer;
+	font-size: 12px;
+	transition: opacity 0.2s ease;
+}
+
+.RoomWrapper-save-btn:hover {
+	opacity: 0.8;
 }
 
 .RoomWrapper-content {

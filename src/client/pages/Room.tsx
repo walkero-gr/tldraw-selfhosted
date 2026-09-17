@@ -10,6 +10,7 @@ import {
 import {getAssetUrlsByMetaUrl} from '@tldraw/assets/urls'
 import { useParams } from 'react-router-dom'
 import { ReactNode, useEffect, useState } from 'react'
+import { addRoom, getRoomName, updateRoomName } from '../roomHistory'
 
 const assetUrls = getAssetUrlsByMetaUrl();
 
@@ -23,6 +24,13 @@ const roomId = 'test-room'
 
 export function Room() {
     const { roomId } = useParams<{ roomId: string }>()
+
+    // Record room access in history
+    useEffect(() => {
+        if (roomId) {
+            addRoom(roomId)
+        }
+    }, [roomId])
 
     // Create a store connected to multiplayer.
     const store = useSync({
@@ -53,6 +61,9 @@ export function Room() {
 
 function RoomWrapper({ children, roomId }: { children: ReactNode; roomId?: string }) {
 	const [didCopy, setDidCopy] = useState(false)
+	const [roomName, setRoomName] = useState(getRoomName(roomId || ''))
+	const [isEditing, setIsEditing] = useState(false)
+	const [editingName, setEditingName] = useState(roomName || '')
 
 	useEffect(() => {
 		if (!didCopy) return
@@ -60,11 +71,61 @@ function RoomWrapper({ children, roomId }: { children: ReactNode; roomId?: strin
 		return () => clearTimeout(timeout)
 	}, [didCopy])
 
+	const handleSaveName = () => {
+		if (roomId) {
+			updateRoomName(roomId, editingName)
+			setRoomName(editingName || undefined)
+		}
+		setIsEditing(false)
+	}
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleSaveName()
+		} else if (e.key === 'Escape') {
+			setIsEditing(false)
+			setEditingName(roomName || '')
+		}
+	}
+
 	return (
 		<div className="RoomWrapper">
 			<div className="RoomWrapper-header">
 				<WifiIcon />
-				<div>{roomId}</div>
+				<div className="RoomWrapper-room-info">
+					{isEditing ? (
+						<div className="RoomWrapper-room-edit">
+							<input
+								type="text"
+								value={editingName}
+								onChange={(e) => setEditingName(e.target.value)}
+								onKeyDown={handleKeyDown}
+								placeholder="Room name..."
+								autoFocus
+								maxLength={50}
+							/>
+							<button className="RoomWrapper-save-btn" onClick={handleSaveName}>
+								✓
+							</button>
+						</div>
+					) : (
+						<div className="RoomWrapper-room-display" onClick={() => setIsEditing(true)}>
+							<div className="RoomWrapper-room-name" title="Click to edit name">
+								{roomName ? (
+									<>
+										<span className="RoomWrapper-name">{roomName}</span>
+										<span className="RoomWrapper-id">({roomId})</span>
+									</>
+								) : (
+									<span className="RoomWrapper-id">{roomId}</span>
+								)}
+							</div>
+							<button className="RoomWrapper-edit-hint" title="Click to rename">
+								✏️
+							</button>
+						</div>
+					)}
+				</div>
 				<button
 					className="RoomWrapper-copy"
 					onClick={() => {

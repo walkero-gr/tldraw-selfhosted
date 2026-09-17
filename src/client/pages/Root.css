@@ -1,0 +1,292 @@
+.Root {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100vh;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	font-family: 'Inter', sans-serif;
+	padding: 20px;
+}
+
+.Root-container {
+	text-align: center;
+	background: white;
+	padding: 40px;
+	border-radius: 12px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	max-width: 500px;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+.Root-container h1 {
+	margin: 0;
+	font-size: 32px;
+	color: #333;
+	font-weight: 700;
+}
+
+.Root-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 30px;
+	gap: 20px;
+}
+
+.Root-user-info {
+	min-width: 200px;
+}
+
+.Root-user-display {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	color: #666;
+}
+
+.Root-user-display span {
+	white-space: nowrap;
+}
+
+.Root-user-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 16px;
+	padding: 4px;
+	transition: transform 0.2s ease;
+}
+
+.Root-user-btn:hover {
+	transform: scale(1.2);
+}
+
+.Root-user-edit {
+	display: flex;
+	gap: 8px;
+}
+
+.Root-user-edit input {
+	padding: 6px 10px;
+	border: 2px solid #667eea;
+	border-radius: 6px;
+	font-size: 13px;
+	font-family: 'Inter', sans-serif;
+}
+
+.Root-user-edit input:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.Root-user-save {
+	background: #667eea;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	padding: 6px 10px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.Root-user-save:hover {
+	background: #764ba2;
+}
+
+.Root-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.Root-button {
+	padding: 12px 24px;
+	font-size: 16px;
+	font-weight: 600;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-family: 'Inter', sans-serif;
+}
+
+.Root-button--primary {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+}
+
+.Root-button--primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.Root-button {
+	background: #f0f0f0;
+	color: #333;
+}
+
+.Root-button:hover {
+	background: #e0e0e0;
+	transform: translateY(-2px);
+}
+
+.Root-button--secondary {
+	background: #e8e8ff;
+	color: #667eea;
+	border: 2px solid #667eea;
+}
+
+.Root-button--secondary:hover {
+	background: #ddd5ff;
+}
+
+.Root-list {
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 2px solid #e0e0e0;
+	text-align: left;
+}
+
+.Root-list h3 {
+	margin: 0 0 15px 0;
+	font-size: 18px;
+	color: #333;
+}
+
+.Root-rooms {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.Root-room-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	background: #f8f8f8;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	border: 2px solid transparent;
+}
+
+.Root-room-item:hover {
+	background: #f0f0f0;
+	border-color: #667eea;
+}
+
+.Root-room-info {
+	flex: 1;
+	text-align: left;
+}
+
+.Root-room-id {
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 4px;
+	word-break: break-all;
+}
+
+.Root-room-id-small {
+	font-size: 12px;
+	font-weight: normal;
+	color: #999;
+	margin-left: 4px;
+}
+
+.Root-room-date {
+	font-size: 12px;
+	color: #666;
+}
+
+.Root-room-accessed {
+	font-size: 12px;
+	color: #999;
+	margin-top: 2px;
+}
+
+.Root-room-edit {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.Root-room-edit input {
+	flex: 1;
+	padding: 8px 12px;
+	border: 2px solid #667eea;
+	border-radius: 6px;
+	font-size: 14px;
+	font-family: 'Inter', sans-serif;
+}
+
+.Root-room-edit input:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.Root-room-save {
+	background: #667eea;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	padding: 8px 12px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.Root-room-save:hover {
+	background: #764ba2;
+}
+
+.Root-room-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.Root-room-edit-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 18px;
+	padding: 4px 8px;
+	transition: transform 0.2s ease;
+}
+
+.Root-room-edit-btn:hover {
+	transform: scale(1.2);
+}
+
+.Root-room-delete {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 18px;
+	padding: 4px 8px;
+	transition: transform 0.2s ease;
+	margin-left: 8px;
+}
+
+.Root-room-delete:hover {
+	transform: scale(1.2);
+}
+
+.Root-empty {
+	margin-top: 30px;
+	padding: 20px;
+	text-align: center;
+	color: #999;
+	font-size: 14px;
+	background: #f8f8f8;
+	border-radius: 8px;
+}
