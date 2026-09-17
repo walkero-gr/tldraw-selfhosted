@@ -4,8 +4,8 @@ import { defineConfig } from 'vite'
 
 export default defineConfig(() => ({
 	plugins: [react({ tsDecorators: true })],
-	root: path.join(__dirname, 'src/client'),
-	publicDir: path.join(__dirname, 'public'),
+	root: path.join(import.meta.dirname, 'src/client'),
+	publicDir: path.join(import.meta.dirname, 'public'),
 	server: {
 		port: 5757,
 		allowedHosts: [process.env.ALLOWED_HOSTED ?? '*']
@@ -17,6 +17,6 @@ export default defineConfig(() => ({
     emptyOutDir: true,
     // Forces Vite to use a top-level dist folder,
     // outside the project root defined above
-    outDir: path.join(__dirname, 'dist', 'client'),
+    outDir: path.join(import.meta.dirname, 'dist', 'client'),
   },
 }))
