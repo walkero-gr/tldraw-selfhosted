@@ -18,6 +18,19 @@ const app = fastify()
 app.register(websocketPlugin)
 app.register(cors, { origin: '*' });
 
+// Enable JSON parsing for POST requests
+app.addContentTypeParser('application/json', (req, body, done) => {
+  let jsonData = ''
+  body.on('data', chunk => { jsonData += chunk })
+  body.on('end', () => {
+    try {
+      done(null, JSON.parse(jsonData))
+    } catch (err) {
+      done(err as Error)
+    }
+  })
+})
+
 if(process.env.NODE_ENV === 'production') {
 	app.register(ServeStatic, {
 		root: path.resolve(import.meta.dirname, '..', '..', 'client', 'assets'),
@@ -95,9 +108,10 @@ app.register(async (app) => {
 	});
 
 	// Import room with full diagram snapshot
-	app.post('/api/import/:roomId', async (req, res) => {
-		const roomId = (req.params as any).roomId as string
-		const { snapshot } = req.body as any
+	app.post<{ Params: { roomId: string } }>('/api/import/:roomId', async (req, res) => {
+		const roomId = req.params.roomId
+		const body = req.body as any
+		const snapshot = body?.snapshot
 		try {
 			if (!snapshot) {
 				return res.code(400).send({ error: 'Missing snapshot' })
@@ -106,6 +120,8 @@ app.register(async (app) => {
 			const DIR = process.env.CONFIG_DIR ? join(process.env.CONFIG_DIR, 'rooms') : './.rooms'
 			await mkdir(DIR, { recursive: true })
 			await writeFile(join(DIR, roomId), JSON.stringify(snapshot))
+			const roomsDir = DIR
+			console.log('snapshot imported for room', roomId, 'to', roomsDir)
 			res.send({ ok: true })
 		} catch (error) {
 			console.error('Import failed:', error)

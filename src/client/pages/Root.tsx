@@ -8,6 +8,10 @@ import './Root.css'
 
 const ROOMS_KEY = 'tldraw-room-history'
 
+function getWorkerUrl(): string {
+	return import.meta.env.VITE_WORKER_URL ?? ''
+}
+
 export function Root() {
 	const navigate = useNavigate()
 	const [rooms, setRooms] = useState<RoomHistory[]>([])
@@ -69,8 +73,7 @@ export function Root() {
 			// Fetch diagram snapshot from server
 			let snapshot = null
 			try {
-				const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? 'http://localhost:5858';
-				const exportRes = await fetch(`${WORKER_URL}/api/export/${room.id}`)
+				const exportRes = await fetch(`/api/export/${room.id}`)
 				if (exportRes.ok) {
 					const data = await exportRes.json()
 					snapshot = data.snapshot
@@ -131,9 +134,8 @@ export function Root() {
 				// If snapshot included, restore it
 				if (data.snapshot) {
 					try {
-						const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? 'http://localhost:5858';
 						const importRes = await fetch(
-							`${WORKER_URL}/api/import/${importedRoom.id}`,
+							`/api/import/${importedRoom.id}`,
 							{
 								method: 'POST',
 								headers: { 'Content-Type': 'application/json' },

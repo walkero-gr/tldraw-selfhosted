@@ -14,9 +14,9 @@ import { addRoom, getRoomName, updateRoomName } from '../roomHistory'
 
 const assetUrls = getAssetUrlsByMetaUrl();
 
-let WORKER_URL = import.meta.env.VITE_WORKER_URL ?? 'http://localhost:5858';
+let WORKER_URL = import.meta.env.VITE_WORKER_URL ?? '';
 if(import.meta.env.MODE === 'production') {
-    WORKER_URL = window.location.origin;
+    WORKER_URL = '';
 }
 
 // In this example, the room ID is hard-coded. You can set this however you like though.
