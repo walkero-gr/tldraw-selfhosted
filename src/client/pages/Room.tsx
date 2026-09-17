@@ -19,6 +19,12 @@ if(import.meta.env.MODE === 'production') {
     WORKER_URL = '';
 }
 
+function getWebSocketUrl(roomId: string): string {
+    const base = WORKER_URL || window.location.origin
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    return `${protocol}//${new URL(base).host}/api/connect/${roomId}`
+}
+
 // In this example, the room ID is hard-coded. You can set this however you like though.
 const roomId = 'test-room'
 
@@ -35,7 +41,7 @@ export function Room() {
     // Create a store connected to multiplayer.
     const store = useSync({
         // We need to know the websocket's URI...
-        uri: `${WORKER_URL}/api/connect/${roomId}`,
+        uri: getWebSocketUrl(roomId),
         // ...and how to handle static assets like images & videos
         assets: multiplayerAssets,
     })
@@ -151,7 +157,7 @@ const multiplayerAssets: TLAssetStore = {
         const id = uniqueId()
 
         const objectName = `${id}-${file.name}`
-        const url = `${WORKER_URL}/api/uploads/${encodeURIComponent(objectName)}`
+        const url = `/api/uploads/${encodeURIComponent(objectName)}`
 
         const response = await fetch(url, {
             method: 'PUT',
@@ -188,7 +194,7 @@ async function unfurlBookmarkUrl({ url }: { url: string }): Promise<TLBookmarkAs
     }
 
     try {
-        const response = await fetch(`${WORKER_URL}/api/unfurl?url=${encodeURIComponent(url)}`)
+        const response = await fetch(`/api/unfurl?url=${encodeURIComponent(url)}`)
         const data = await response.json()
 
         asset.props.description = data?.description ?? ''
